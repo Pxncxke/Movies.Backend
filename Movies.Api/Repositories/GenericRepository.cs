@@ -21,7 +21,7 @@ public class GenericRepository<T> : IGenericRepository<T> where T : BaseEntity
 
     public async Task DeleteAsync(Guid id)
     {
-        var entity = _context.FindAsync<T>(id);
+        var entity = await _context.FindAsync<T>(id);
         _context.Remove(entity);
         await _context.SaveChangesAsync();
     }

@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Movies.Api.Exceptions;
 using Movies.Api.Interfaces;
+using Movies.Api.Models;
 using Movies.Api.Models.Genres;
 using Movies.Api.Validations.Genres;
 using Movies.Domain.Models;
@@ -33,9 +34,15 @@ public class GenreService : IGenreService
         await _genreRepository.CreateAsync(genre);
     }
 
-    public Task DeleteGenreAsync(Guid id)
+    public async Task DeleteGenreAsync(Guid id)
     {
-        throw new NotImplementedException();
+        var validator = new DeleteGenreValidator(_genreRepository);
+        var validationResult = await validator.ValidateAsync(id);
+        if (!validationResult.IsValid)
+        {
+            throw new NotFoundException(nameof(Genre), id);
+        }
+        await _genreRepository.DeleteAsync(id);
     }
 
     public async Task<List<GenreDto>> GetAllGenresAsync()
@@ -47,6 +54,7 @@ public class GenreService : IGenreService
         return dto;
     }
 
+
     public async Task<GenreDto> GetGenreByIdAsync(Guid id)
     {
         var genre = await _genreRepository.GetByIdAsync(id) ?? throw new NotFoundException(nameof(Genre), id);
@@ -56,8 +64,29 @@ public class GenreService : IGenreService
         return dto;
     }
 
-    public Task UpdateGenreAsync(CreateGenreDto genre)
+    public async Task<PagedList<GenreDto>> GetGenresWithPaginationAsync(string? search, string? sortColumn, string? sortOrder, int page, int pageSize)
     {
-        throw new NotImplementedException();
+        var genres = await _genreRepository.GetGenresWithPaginationAsync(search, sortColumn, sortOrder, page, pageSize);
+
+     
+        var dto = _mapper.Map<List<GenreDto>>(genres.Items);
+
+        var result = new PagedList<GenreDto>(dto, genres.Page, genres.PageSize, genres.TotalCount);
+
+        return result;
+    }
+
+    public async Task UpdateGenreAsync(UpdateGenreDto genreDto)
+    {
+        var validator = new UpdateGenreValidator(_genreRepository);
+        var validationResult = await validator.ValidateAsync(genreDto);
+        if (!validationResult.IsValid) 
+        {
+            throw new BadRequestException("Invalid Genre", validationResult);
+        }
+        var genre = _mapper.Map<Genre>(genreDto);
+        var previous = await _genreRepository.GetByIdAsync(genre.Id);
+        genre.CreatedAt = previous.CreatedAt;
+        await _genreRepository.UpdateAsync(genre);
     }
 }

@@ -4,32 +4,31 @@ using Movies.Api.Models.Genres;
 
 namespace Movies.Api.Validations.Genres;
 
-public class CreateGenreValidator : AbstractValidator<CreateGenreDto>
+public class UpdateGenreValidator : AbstractValidator<UpdateGenreDto>
 {
     private readonly IGenreRepository _genreRepository;
 
-    public CreateGenreValidator(IGenreRepository genreRepository)
+    public UpdateGenreValidator(IGenreRepository genreRepository)
     {
         RuleFor(x => x.Id)
             .NotNull().WithMessage("Missing Id")
-            .MustAsync(MustNotExist).WithMessage("Id already exists");
+            .MustAsync(MustExist).WithMessage("Id does not exist");
 
         RuleFor(x => x.Name)
             .NotNull().WithMessage("{PropertyName} is required")
             .NotEmpty().WithMessage("{PropertyName} cannot be empty")
             .MaximumLength(50).WithMessage("{PropertyName} must be fewer than 50 characters")
-            .Matches(@"^[A-Z][a-z]*$").WithMessage("{PropertyName} should only have the first letter in uppercase")
+            .Matches(@"^(?:[A-Z][a-z]+ ?)*$").WithMessage("{PropertyName} has an invalid format")
             .MustAsync(MustBeUniqueNameAsync).WithMessage("{PropertyName} already exists");
-
 
         this._genreRepository = genreRepository;
     }
 
-    private async Task<bool> MustNotExist(Guid id, CancellationToken token)
+    private async Task<bool> MustExist(Guid id, CancellationToken token)
     {
         var genre = await _genreRepository.GetByIdAsync(id);
 
-        return genre == null;
+        return genre != null;
     }
 
     private async Task<bool> MustBeUniqueNameAsync(string name, CancellationToken token)

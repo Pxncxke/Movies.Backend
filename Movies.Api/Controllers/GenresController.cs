@@ -22,40 +22,43 @@ namespace Movies.Api.Controllers
 
         // GET: api/<GenresController>
         [HttpGet]
-        public async Task<IActionResult> Get()
+        public async Task<IActionResult> Get(int currentPage, int recordsPerPage)
         {
-            var x = new List<GenreDto>();
-            x.Add(new GenreDto(){ Id = Guid.NewGuid(), Name = "Action"});
+           var response = await _genreService.GetGenresWithPaginationAsync(null, null, null, currentPage, recordsPerPage);
 
-           var result =  await _genreService.GetAllGenresAsync();
-
-
-            return Ok(result);
+            return Ok(response);
         }
 
         // GET api/<GenresController>/5
         [HttpGet("{id}")]
-        public IActionResult Get(int id)
+        public async Task<IActionResult> Get(Guid id)
         {
-            throw new NotFoundException("name", new GenreDto());
+            var response = await _genreService.GetGenreByIdAsync(id);
+            return Ok(response);
         }
 
         // POST api/<GenresController>
         [HttpPost]
-        public void Post([FromBody] string value)
+        public async Task<IActionResult> Post(CreateGenreDto genreDto)
         {
+            await _genreService.CreateGenreAsync(genreDto);
+            return Ok();
         }
 
         // PUT api/<GenresController>/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        [HttpPut]
+        public async Task<IActionResult> Put(UpdateGenreDto genreDto)
         {
+            await _genreService.UpdateGenreAsync(genreDto);
+            return Ok();
         }
 
         // DELETE api/<GenresController>/5
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        public async Task<IActionResult> Delete(Guid id)
         {
+            await _genreService.DeleteGenreAsync(id);
+            return Ok();
         }
     }
 }
