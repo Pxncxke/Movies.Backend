@@ -11,4 +11,5 @@ public interface IActorService
     Task UpdateActorAsync(UpdateActorDto actor);
     Task DeleteActorAsync(Guid id);
     Task<PagedList<ActorDto>> GetActorsWithPaginationAsync(string? search, string? sortColumn, string? sortOrder, int page, int pageSize);
+    Task<List<ActorsMovieDto>> GetActorByNameAsync(string name);
 }

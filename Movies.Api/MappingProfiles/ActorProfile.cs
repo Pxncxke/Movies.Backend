@@ -11,5 +11,6 @@ public class ActorProfile : Profile
         CreateMap<ActorDto, Actor>().ReverseMap();
         CreateMap<CreateActorDto, Actor>().ForMember(x => x.Picture, options => options.Ignore()).ReverseMap();
         CreateMap<UpdateActorDto, Actor>().ReverseMap();
+        CreateMap<ActorsMovieDto, Actor>().ReverseMap();
     }
 }

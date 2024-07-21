@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Movies.Api.Interfaces;
 using Movies.Api.Models.MovieTheaters;
 using Movies.Api.Services;
@@ -9,6 +11,7 @@ namespace Movies.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Policy = "IsAdmin")]
     public class MovieTheatersController : ControllerBase
     {
         private readonly IMovieTheaterService movieTheaterService;
@@ -23,6 +26,13 @@ namespace Movies.Api.Controllers
         {
             var response = await movieTheaterService.GetMovieTheatersWithPaginationAsync(null, null, null, currentPage, recordsPerPage);
 
+            return Ok(response);
+        }
+
+        [HttpGet("all")]
+        public async Task<IActionResult> GetAllMovieTheaters()
+        {
+            var response = await movieTheaterService.GetAllMovieTheatersAsync();
             return Ok(response);
         }
 

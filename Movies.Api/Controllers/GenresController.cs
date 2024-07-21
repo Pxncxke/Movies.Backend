@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Movies.Api.Exceptions;
 using Movies.Api.Interfaces;
@@ -11,6 +13,7 @@ namespace Movies.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Policy = "IsAdmin")]
     public class GenresController : ControllerBase
     {
         private readonly IGenreService _genreService;
@@ -26,6 +29,14 @@ namespace Movies.Api.Controllers
         {
            var response = await _genreService.GetGenresWithPaginationAsync(null, null, null, currentPage, recordsPerPage);
 
+            return Ok(response);
+        }
+
+        [HttpGet("all")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetAllGenres()
+        {
+            var response = await _genreService.GetAllGenresAsync();
             return Ok(response);
         }
 

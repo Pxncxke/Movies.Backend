@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Movies.Api.Interfaces;
 using Movies.Api.Models.Actors;
 using Movies.Api.Services;
@@ -9,6 +11,7 @@ namespace Movies.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Policy = "IsAdmin")]
     public class ActorsController : ControllerBase
     {
         private readonly IActorService actorService;
@@ -26,11 +29,25 @@ namespace Movies.Api.Controllers
             return Ok(response);
         }
 
+        [HttpGet("all")]
+        public async Task<IActionResult> GetAllActors()
+        {
+            var response = await actorService.GetAllActorsAsync();
+            return Ok(response);
+        }
+
         // GET api/<ActorsController>/5
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(Guid id)
         {
             var response = await actorService.GetActorByIdAsync(id);
+            return Ok(response);
+        }
+
+        [HttpGet("searchByName/{query}")]
+        public async Task<IActionResult> SearchByName(string query)
+        {
+            var response = await actorService.GetActorByNameAsync(query);
             return Ok(response);
         }
 

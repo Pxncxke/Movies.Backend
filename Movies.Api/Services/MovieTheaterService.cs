@@ -33,9 +33,11 @@ public class MovieTheaterService : IMovieTheaterService
         await movieTheaterRepository.DeleteAsync(id);
     }
 
-    public Task<List<MovieTheaterDto>> GetAllMovieTheatersAsync()
+    public async Task<List<MovieTheaterDto>> GetAllMovieTheatersAsync()
     {
-        throw new NotImplementedException();
+        var movieTheaters = await movieTheaterRepository.GetAsync();
+        var result = mapper.Map<List<MovieTheaterDto>>(movieTheaters);
+        return result;
     }
 
     public async Task<MovieTheaterDto> GetMovieTheaterByIdAsync(Guid id)

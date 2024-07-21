@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Movies.Api.Data;
 using NetTopologySuite.Geometries;
@@ -12,9 +13,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Movies.Api.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    partial class DatabaseContextModelSnapshot : ModelSnapshot
+    [Migration("20240720040432_IdentityUpdate")]
+    partial class IdentityUpdate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -250,8 +253,6 @@ namespace Movies.Api.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ModifiedBy");
-
                     b.ToTable("Actors");
                 });
 
@@ -274,8 +275,6 @@ namespace Movies.Api.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ModifiedBy");
 
                     b.ToTable("Genres");
                 });
@@ -319,8 +318,6 @@ namespace Movies.Api.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ModifiedBy");
-
                     b.ToTable("Movies");
                 });
 
@@ -348,8 +345,6 @@ namespace Movies.Api.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ModifiedBy");
-
                     b.ToTable("MovieTheaters");
                 });
 
@@ -375,8 +370,6 @@ namespace Movies.Api.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ModifiedBy");
 
                     b.HasIndex("MovieTheaterId");
 
@@ -418,8 +411,6 @@ namespace Movies.Api.Migrations
 
                     b.HasIndex("ActorId");
 
-                    b.HasIndex("ModifiedBy");
-
                     b.HasIndex("MovieId", "ActorId")
                         .IsUnique();
 
@@ -451,42 +442,10 @@ namespace Movies.Api.Migrations
 
                     b.HasIndex("GenreId");
 
-                    b.HasIndex("ModifiedBy");
-
                     b.HasIndex("MovieId", "GenreId")
                         .IsUnique();
 
                     b.ToTable("MoviesGenres");
-                });
-
-            modelBuilder.Entity("Movies.Domain.Models.Rating", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("ModifiedBy")
-                        .HasColumnType("text");
-
-                    b.Property<Guid>("MovieId")
-                        .HasColumnType("uuid");
-
-                    b.Property<int>("Rate")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ModifiedBy");
-
-                    b.HasIndex("MovieId");
-
-                    b.ToTable("Ratings");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -540,48 +499,8 @@ namespace Movies.Api.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Movies.Domain.Models.Actor", b =>
-                {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "User")
-                        .WithMany()
-                        .HasForeignKey("ModifiedBy");
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("Movies.Domain.Models.Genre", b =>
-                {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "User")
-                        .WithMany()
-                        .HasForeignKey("ModifiedBy");
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("Movies.Domain.Models.Movie", b =>
-                {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "User")
-                        .WithMany()
-                        .HasForeignKey("ModifiedBy");
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("Movies.Domain.Models.MovieTheater", b =>
-                {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "User")
-                        .WithMany()
-                        .HasForeignKey("ModifiedBy");
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("Movies.Domain.Models.MovieTheatersMovies", b =>
                 {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "User")
-                        .WithMany()
-                        .HasForeignKey("ModifiedBy");
-
                     b.HasOne("Movies.Domain.Models.Movie", "Movie")
                         .WithMany("MovieTheatersMovies")
                         .HasForeignKey("MovieId")
@@ -597,8 +516,6 @@ namespace Movies.Api.Migrations
                     b.Navigation("Movie");
 
                     b.Navigation("MovieTheater");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Movies.Domain.Models.MoviesActors", b =>
@@ -609,10 +526,6 @@ namespace Movies.Api.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "User")
-                        .WithMany()
-                        .HasForeignKey("ModifiedBy");
-
                     b.HasOne("Movies.Domain.Models.Movie", "Movie")
                         .WithMany("MoviesActors")
                         .HasForeignKey("MovieId")
@@ -622,8 +535,6 @@ namespace Movies.Api.Migrations
                     b.Navigation("Actor");
 
                     b.Navigation("Movie");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Movies.Domain.Models.MoviesGenres", b =>
@@ -634,10 +545,6 @@ namespace Movies.Api.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "User")
-                        .WithMany()
-                        .HasForeignKey("ModifiedBy");
-
                     b.HasOne("Movies.Domain.Models.Movie", "Movie")
                         .WithMany("MoviesGenres")
                         .HasForeignKey("MovieId")
@@ -647,25 +554,6 @@ namespace Movies.Api.Migrations
                     b.Navigation("Genre");
 
                     b.Navigation("Movie");
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("Movies.Domain.Models.Rating", b =>
-                {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "User")
-                        .WithMany()
-                        .HasForeignKey("ModifiedBy");
-
-                    b.HasOne("Movies.Domain.Models.Movie", "Movie")
-                        .WithMany()
-                        .HasForeignKey("MovieId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Movie");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Movies.Domain.Models.Movie", b =>

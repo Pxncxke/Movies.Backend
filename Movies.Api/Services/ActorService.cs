@@ -52,6 +52,15 @@ public class ActorService : IActorService
         return dto;
     }
 
+    public async Task<List<ActorsMovieDto>> GetActorByNameAsync(string name)
+    {
+        var actor = await _actorRepository.SearchActorsByName(name) ?? throw new NotFoundException(nameof(Actor), name);
+
+        var dto = _mapper.Map<List<ActorsMovieDto>>(actor);
+
+        return dto;
+    }
+
     public async Task<PagedList<ActorDto>> GetActorsWithPaginationAsync(string? search, string? sortColumn, string? sortOrder, int page, int pageSize)
     {
         var genres = await _actorRepository.GetActorsWithPaginationAsync(search, sortColumn, sortOrder, page, pageSize);
@@ -64,9 +73,11 @@ public class ActorService : IActorService
         return result;
     }
 
-    public Task<List<ActorDto>> GetAllActorsAsync()
+    public async Task<List<ActorDto>> GetAllActorsAsync()
     {
-        throw new NotImplementedException();
+        var actors = await _actorRepository.GetAsync();
+        var result = _mapper.Map<List<ActorDto>>(actors);
+        return result;
     }
 
     public async Task UpdateActorAsync(UpdateActorDto actorDto)
